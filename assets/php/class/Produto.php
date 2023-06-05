@@ -1,5 +1,5 @@
 <?php
-include_once('../bd/DataBase.php.php');
+include('DataBase.php');
 
 class Produto {
   private $nomeProduto;
@@ -8,10 +8,6 @@ class Produto {
   private $valorProduto;
   private $imagemProduto = [];
   private $videoProduto;
-
-  public function Produto() {
-
-  }
 
   function __construct($nome, $descricao, $codigo, $valor, $imagens, $video)  {
     $this->nomeProduto = $nome;
@@ -29,18 +25,20 @@ class Produto {
     // 2. verificar se já existe o código no banco de dados
     $this->validateProduct($codigo);
     // 3. validar imagens
-    $extensaoImg = $this->validateImagens($imagens, $codigo);
+    $extensaoImg[] = $this->validateImagens($imagens);
     // 3. validar video
-    $extensaoVideo = $this->validateVideo($video, $codigo);
+    $extensaoVideo = $this->validateVideo($video);
     // gerar novos nomes para imagens e video
     $novosNomes = $this->newNameFolder($imagens);
     // 4. Criar pasta
     $pastaServ = $this->createFolder($codigo);
     // 5. Salvando o caminho das imagens
-    $caminho = $this->filePath($pastaServ, $codigo, $novosNomes, $imagens, $extensaoImg, $extensaoVideo);
-    
-   
-    // // 5. Salvando descrião do produto
+    $caminho = $this->filePath($pastaServ, $codigo, $novosNomes, $extensaoImg, $extensaoVideo);
+    // 6. Salvando no Servidor
+    $salvo = $this->saveFile($caminho, $imagens);
+    // 5. Salvando descrião do produto
+
+    echo '<h1>Sucesso</h1>';
     // $this->uploadDescricao($nome, $descricao, $codigo, $valor);
     // // 6. Salvando imagens e video do produto
     // $this->uploadArquivos($imagens, $video);
@@ -48,23 +46,38 @@ class Produto {
 
   }
 
-  private function filePath($pastaServ, $codigo, $novosNomes, $imagens, $extensaoImg, $extensaoVideo) {
+  private function saveFile($caminho, $imagens){
+    foreach ($imagens["tmp_name"] as $key => $imagem) {
+      $caminhoServ = $caminho['imagens'][$key]['caminhoServidor'];
+     if(!move_uploaded_file($imagem, $caminhoServ))
+      throw new Exception("Error: Ao Salvar Arquivos no Servidor" . $imagem['name'][$key]);
+    }
+
+    $caminhoVideoServ = $caminho['video']['caminhoServidor'];
+    if (!move_uploaded_file($imagens['tmp_name']['video'], $caminhoVideoServ)) 
+    throw new Exception("Erro ao salvar arquivo de vídeo no servidor: " . $imagens['name']['video']);
+
+    return true;
+  }
+
+  private function filePath($pastaServ, $codigo, $novosNomes, $extensaoImg, $extensaoVideo) {
     $caminhos = [];
-    
-    foreach ($novosNomes as $nome) {
-      $caminhoImg = $pastaServ . $nome . '.' . $extensaoImg;
-      $caminhoIndex = 'assets/img/teste/' . $codigo . '/' . $nome . '.' . $extensaoImg;
-      $caminhos['imagens'][] = [
-        'caminhoServidor' => $caminhoImg,
-        'caminhoIndex' => $caminhoIndex
+    $extensaoImagem = $extensaoImg;
+    var_dump($extensaoImagem);
+    foreach ($novosNomes as $key => $nome) {
+      $caminhoImgServ = $pastaServ . $nome . '.' . $extensaoImagem[$key];
+      $caminhoImgIndex = 'assets/img/teste/' . $codigo . '/' . $nome . '.' . $extensaoImagem[$key];
+      $caminhos['imagens'][$key] = [
+        'caminhoServidor' => $caminhoImgServ,
+        'caminhoIndex' => $caminhoImgIndex
       ];
     }
     
     $ultimoNome = end($novosNomes);
-    $caminhoVideoServidor = $pastaServ . $ultimoNome . '.' . $extensaoVideo;
+    $caminhoVideoServ = $pastaServ . $ultimoNome . '.' . $extensaoVideo;
     $caminhoVideoIndex = 'assets/img/teste/' . $codigo . '/' . $ultimoNome . '.' . $extensaoVideo;
     $caminhos['video'] = [
-      'caminhoServidor' => $caminhoVideoServidor,
+      'caminhoServidor' => $caminhoVideoServ,
       'caminhoIndex' => $caminhoVideoIndex
     ];
   
@@ -72,9 +85,9 @@ class Produto {
   }
 
   private function newNameFolder($imagens){
-    $novoNomeImg = null;
-    for ($i = 0; $i < count($imagens['name'] + 1); $i++) {
-      $novoNomeImg += uniqid();
+    $novoNomeImg = [];
+    for ($i = 0; $i < count($imagens['name']) + 1; $i++) {
+      $novoNomeImg[] = uniqid();
     }
    
     return $novoNomeImg;
@@ -82,6 +95,8 @@ class Produto {
 
   private function createFolder($codigo) {
     $pastaServ = "../img/teste/$codigo/";
+    if(file_exists($pastaServ))
+    throw new Exception("Error: Pasta de arquivos já existe no Servidor");
 
     if (!mkdir($pastaServ, 0755, true)) {
       throw new Exception("Ao criar a pasta para salvar a imagem,
@@ -92,23 +107,25 @@ class Produto {
   }
 
   private function deleteFolder($pastaServ) {
-    if (is_dir($pastaServ)) {
+    if (file_exists($pastaServ)) {
       array_map('unlink', glob("$pastaServ/*.*"));
       rmdir($pastaServ);
     }
+    return false;
   }
 
   private function  validateImagens($imagens){
-    foreach ($imagens as $key => $value) {
-     $nomeImg = $imagens['name'][$key];
+    $extensoesImg = [];
+    foreach ($imagens['name'] as $key => $imagem) {
+     $nomeImg = $imagem;
      $extensaoImg = strtolower(pathinfo($nomeImg, PATHINFO_EXTENSION));
-
-     if ($extensaoImg  != 'jpg' && $extensaoImg != 'png' && $extensaoImg != 'webp')
-      throw new Exception("ADICIONE IMAGEM DO TIPO (PNG, JPG OU WEBP)");
+     if ($extensaoImg != 'jpg' && $extensaoImg != 'png' && $extensaoImg != 'webp')
+      throw new Exception("ADICIONE IMAGEM DO TIPO (PNG, JPG OU WEBP)" . var_dump($imagem[$key]));
       
+      $extensoesImg[$key] = $extensaoImg;
     }
-
-    return $extensaoImg;
+   
+    return $extensoesImg;
   }
 
   private function  validateVideo($video){
@@ -118,7 +135,7 @@ class Produto {
      if ($extensaoVideo != 'mp4' && $extensaoVideo != 'mov' && $extensaoVideo != 'mkv')
       throw new Exception("ADICIONE VIDEO DO TIPO (MP4, MOV OU MKV)");
 
-    return true;
+    return $extensaoVideo;
   }
 
   private function uploadDescricao($nome, $descricao, $codigo, $valor) {
@@ -150,22 +167,22 @@ class Produto {
 
   private function validateData($nome, $descricao, $codigo, $valor, $imagens, $video) {
     
-    if (empty($nomeProduto)) {
-      throw new Exception("O nome do produto é obrigatório.");
+    if (empty($nome)) {
+      throw new Exception("O nome do produto Não foi fornecido.");
     }
-    if (empty($descricaoProduto)) {
+    if (empty($descricao)) {
       throw new Exception("A descrição do produto é obrigatório.");
     }
-    if (empty($codigoProduto)) {
+    if (empty($codigo)) {
       throw new Exception("O Código do produto é obrigatório.");
     }
-    if (empty($valorProduto)) {
+    if (empty($valor)) {
       throw new Exception("O Valor do produto é obrigatório.");
     }
-    if (empty($imagemProduto)) {
+    if (empty($imagens)) {
       throw new Exception("A Imagem do produto é obrigatório.");
     }
-    if (empty($videoProduto)) {
+    if (empty($video)) {
       throw new Exception("O Video do produto é obrigatório.");
     }
 

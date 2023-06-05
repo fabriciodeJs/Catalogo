@@ -6,25 +6,25 @@ class DataBase {
   * Host de conexão com banco de dados
   * @var string
   */
-  const HOST = '192.168.45.222';
+  const HOST = 'localhost';
 
   /**
   *Nome do banco de dados
   * @var string
   */
-  const NAME = 'teste';
+  const NAME = 'testecatalogo';
 
   /**
   * usuário do banco de dados
   * @var string
   */
-  const USER = 'fabricio';
+  const USER = 'root';
 
   /**
   * Senha do banco de dados
   * @var string
   */
-  const PASS = '123456';
+  const PASS = '';
 
   /**
   * tabela banco de dados
@@ -67,7 +67,7 @@ class DataBase {
   }
 
   public function uploadArquivos($imagens, $video) {
-
+    
   }
 
   public function validateProduct($codigo) {
