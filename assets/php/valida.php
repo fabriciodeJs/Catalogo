@@ -1,29 +1,25 @@
 <?php
 include('class/Produto.php');
+include('class/Usuario.php');
 
-if (isset($_POST['nomeProduto']) 
-  and isset($_POST['codigoProduto']) 
-  and isset($_POST['descricaoProduto'])
-  and isset($_POST['valorProduto'])
-  and isset($_FILES['imagemProduto'])
-  and isset($_FILES['videoProduto'])) {
-  
-  $nomeProduto = $_POST['nomeProduto'];
-  $descricaoProduto = $_POST['descricaoProduto'];
-  $codigoProduto = $_POST['codigoProduto'];
-  $valorProduto = $_POST['valorProduto'];
-  $imagemProduto = $_FILES['imagemProduto'];
-  $videoProduto = $_FILES['videoProduto'];
+if (!empty($_POST['nomeProduto']) 
+  and !empty($_POST['codigoProduto']) 
+  and !empty($_POST['descricaoProduto'])
+  and !empty($_POST['valorProduto'])
+  and !empty($_FILES['imagemProduto'])
+  and !empty($_FILES['videoProduto'])) {
 
-  $produto = new Produto($nomeProduto, $descricaoProduto, $codigoProduto, $valorProduto, $imagemProduto, $videoProduto);
-  $produto->upload($_POST['nomeProduto'], 
-                  $_POST['descricaoProduto'], 
-                  $_POST['codigoProduto'], 
-                  $_POST['valorProduto'],  
-                  $_FILES['imagemProduto'],
-                  $_FILES['videoProduto']);
+  $produto = new Produto();
   
-  // header("Location: class/Produto.php");
+  $produto->upload($_POST['nomeProduto'], $_POST['codigoProduto'], $_POST['descricaoProduto'], 
+                   $_POST['valorProduto'], $_FILES['imagemProduto'], $_FILES['videoProduto']);
+}else{
+  die('Preencha todos os dados!');
 }
 
-?>
+if (!empty($_POST['user']) and !empty($_POST['password'])){
+  $user = new Usuario();
+  $user->logar($_POST['user'], $_POST['password']);
+}else{
+  die('Preencha todos os dados!');
+}

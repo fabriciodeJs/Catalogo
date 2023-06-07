@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <form enctype="multipart/form-data" action="assets/php/va" method="post">
+  <form enctype="multipart/form-data" action="assets/php/valida.php" method="post">
     <div>
       <label class="labels" for="codigoProduto">Código Do Produto: </label>
       <input class="inputs" type="text" name="codigoProduto" id="codigoProduto" required>
@@ -30,11 +30,11 @@
 
     <div>
       <label class="labels" for="imagemProduto">Imagem Do Produto: </label>
-      <input class="inputs" type="file" multiple="multiple" name="imagemProduto[]" id="imagemProduto" >
+      <input class="inputs" type="file" multiple="multiple" name="imagemProduto[]" id="imagemProduto">
     </div>
     <div>
       <label class="labels" for="videoProduto">Video Do Produto: </label>
-      <input class="inputs" type="file" name="videoProduto" accept="video/mp4, video/mov, video/mkv" id="videoProduto" >
+      <input class="inputs" type="file" name="videoProduto" accept="video/mp4, video/mov, video/mkv" id="videoProduto">
     </div>
     <input id="botaoSubmit" type="submit" value="Cadastrar">
   </form>
