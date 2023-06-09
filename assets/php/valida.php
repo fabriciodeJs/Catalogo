@@ -13,9 +13,13 @@ if (!empty($_POST['nomeProduto'])
   
   $produto->upload($_POST['nomeProduto'], $_POST['codigoProduto'], $_POST['descricaoProduto'], 
                    $_POST['valorProduto'], $_FILES['imagemProduto'], $_FILES['videoProduto']);
+  
+  die();
 }else{
   die('Preencha todos os dados!');
 }
+
+
 
 if (!empty($_POST['user']) and !empty($_POST['password'])){
   $user = new Usuario();

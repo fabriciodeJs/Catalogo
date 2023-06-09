@@ -6,12 +6,31 @@ class DataBase {
   const NAME = 'testecatalogo';
   const USER = 'root';
   const PASS = '';
-  private $table;
   private $conn;
 
-  public function __construct($table = null)  {
-    $this->table = $table;
+  public function __construct()  {
     $this->setConnection();
+  }
+
+  public function lastInsertId(){
+    try {
+      return $this->conn->lastInsertId();
+    } catch (PDOException $error) {
+      echo 'Error: ' . $error;
+    }
+    
+  }
+
+  public function beginTransaction(){
+    return $this->conn->beginTransaction();
+  }
+
+  public function commit(){
+   return $this->conn->commit();
+  }
+
+  public function rollBack(){
+    return $this->conn->rollBack();
   }
 
   private function setConnection() {
