@@ -9,7 +9,8 @@ class Usuario{
 
   public function logar($user, $password) {
     $bd = new DataBase();
-    $query = "SELECT id_usuario, usuario, senha_usuario
+    
+    $query = "SELECT *
               FROM usuarios 
               WHERE usuario = ? AND senha_usuario = ?";
     
@@ -18,12 +19,15 @@ class Usuario{
     $stmt_verificarLogin->bindValue(2, $password, PDO::PARAM_STR);
     $stmt_verificarLogin->execute();
 
-    if (!$usuario = $stmt_verificarLogin->fetch(PDO::FETCH_ASSOC)) 
-    die('Usuario não Localizado!');
-      
-    header('location: ../../cadastro.php');
+    $usuario = $stmt_verificarLogin->fetch(PDO::FETCH_ASSOC);
+
+
+    if(!$usuario) return false;
+    
+    return true;
     
   }
+
 
 
   // public function cadastra($user, $password){

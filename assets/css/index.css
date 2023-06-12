@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+:root {
+    --font-black: rgb(32, 32, 32);
+    --font-white: rgb(255, 255, 255);
+    --primary-color: rgb(12, 76, 163);
+    --second-color: rgb(0, 149, 218);
+}
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'arial','Noto Serif', serif;
+}
+
+/*  Cabeçalho  */
+
+#container-cabecalho {
+  width: 100%;
+  height: 100px;
+  box-shadow: 5px 5px 10px rgba(0, 149, 218, 0.281);
+  display: flex;
+
+}
+
+#container-cabecalho #logo{
+  display: flex;
+  width: 90vw;
+  align-items: center;
+  justify-content: center;
+  margin-left: 11%;
+}
+
+#container-cabecalho img {
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  
+}
+
+header #botao {
+  width: 10vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+header div a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px;
+  height: 35px;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bolder;
+  color: var(--font-white);
+  background-color: var(--primary-color);
+}
+
+header div a:hover {
+  transition: .5s;
+  background-color: var(--second-color);
+  color: var(--font-black);
+}
+
+main {
+  width: auto;
+  margin: auto;
+}
+
+main section {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  gap: 15px 10px;
+  padding: 5vh 1vw;
+  align-items: center;
+  
+}
+
+main section .container-item {
+  display: flex;
+  max-width: 300px;
+  max-height: 350px;
+  width: auto; 
+  height: auto; 
+  cursor: pointer;
+  text-align: center;
+  margin: auto;
+  justify-content: center;
+  padding: 10px;
+}
+
+
+main section .container-item .card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+main .container-item .card-item #imagens {
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  padding: 10px 0;
+}
+
+main .container-item .card-item h3 {
+  padding: 10px;
+}
+#paginacao {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+}
+
+#paginacao p, #paginacao a,i{
+  padding: 5px 15px;
+  margin: 0 10px;
+  font-size: 1.2em;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bolder;
+  color: var(--font-white);
+  background-color: var(--primary-color);
+}
+
+#paginacao a:hover {
+  transition: .5s;
+  background-color: var(--second-color);
+  color: var(--font-black);
+}
+
+@media screen and (min-width: 950px) and (max-width: 1200px) {
+  main section {
+      display: grid;
+      grid-template-columns: auto auto auto;
+  }
+}
+
+@media screen and (min-width: 700px) and (max-width: 950px) {
+  main section {
+      display: grid;
+      grid-template-columns: auto auto;
+  }
+
+
+}
+
+@media screen and (max-width: 700px) {
+  main section {
+      display: block;
+      flex-direction: column;
+      align-items: center;
+
+  }
+
+  main section .container-item {
+      display: flex;
+      margin: 40px auto;
+      justify-content: center;
+  }
+}

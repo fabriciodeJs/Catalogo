@@ -13,17 +13,24 @@ if (!empty($_POST['nomeProduto'])
   
   $produto->upload($_POST['nomeProduto'], $_POST['codigoProduto'], $_POST['descricaoProduto'], 
                    $_POST['valorProduto'], $_FILES['imagemProduto'], $_FILES['videoProduto']);
+  echo 'cadastrar';
   
   die();
-}else{
-  die('Preencha todos os dados!');
 }
 
 
+if (isset($_POST['user']) && isset($_POST['password'])) {
 
-if (!empty($_POST['user']) and !empty($_POST['password'])){
+
+
   $user = new Usuario();
-  $user->logar($_POST['user'], $_POST['password']);
-}else{
-  die('Preencha todos os dados!');
+  $result = $user->logar($_POST['user'], $_POST['password']);
+
+  if ($result) {
+    echo header("location: ../../cadastro.php");
+    exit();
+  }else{
+      echo "Usuario ou senha não encotrados";
+      echo header("location: ../../login.php");
+  }
 }

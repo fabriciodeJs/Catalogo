@@ -33,6 +33,10 @@ class DataBase {
     return $this->conn->rollBack();
   }
 
+  public function query($valor){
+    return $this->conn->query($valor);
+  }
+
   private function setConnection() {
     try {
       $this->conn = new PDO('mysql:host='.self::HOST.';dbname='.self::NAME,self::USER,self::PASS);

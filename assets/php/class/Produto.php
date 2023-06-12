@@ -2,14 +2,14 @@
 include('DataBase.php');
 
 class Produto{
+  private DataBase $db;
 
   function __construct(){
- 
+    $this->db = new DataBase();
   }
 
   public function upload($nome, $codigo, $descricao, $valor, $imagens, $video){
-    $db = new DataBase();
-    $db->beginTransaction();
+
     // 1. Validação dos dados recebidos
     $this->validateData($nome, $descricao, $codigo, $valor, $imagens, $video);
     // 2. verificar se já existe o código no banco de dados
@@ -58,7 +58,7 @@ class Produto{
   private function filePathVideo($pastaServ, $codigo, $novosNomes, $extensaoVideo){
     $ultimoNome = end($novosNomes);
     $caminhoVideoServ = $pastaServ . $ultimoNome . '.' . $extensaoVideo;
-    $caminhoVideoIndex = 'assets/img/teste/' . $codigo . '/' . $ultimoNome . '.' . $extensaoVideo;
+    $caminhoVideoIndex = 'assets/img/' . $codigo . '/' . $ultimoNome . '.' . $extensaoVideo;
 
     return [$caminhoVideoServ , $caminhoVideoIndex];
   }
@@ -131,10 +131,10 @@ class Produto{
   }
 
   private function setDescricao($nome, $descricao, $codigo, $valor){
-    $db = new DataBase();
+    
 
     $query_produto = "INSERT INTO produto(CODIGO, NOME, DESCRICAO, VALOR) VALUES (?, ?, ?, ?)";
-    $stmt_envioProduto = $db->prepare($query_produto);
+    $stmt_envioProduto = $this->db->prepare($query_produto);
     $stmt_envioProduto->bindValue(1, $codigo, PDO::PARAM_STR);
     $stmt_envioProduto->bindValue(2, $nome, PDO::PARAM_STR);
     $stmt_envioProduto->bindValue(3, $descricao, PDO::PARAM_STR);
@@ -147,37 +147,48 @@ class Produto{
   }
 
   private function setArquivos($caminhoImgIndex, $caminhoVideo, $codigo){
-    $db = new DataBase();
-    $id_Produto = $db->lastInsertId();
-    $query = "INSERT INTO imagens(ID, CODIGO_PRODUTO, video)
-              VALUES (?,?,?)";
-    $stmt_envioArquivo = $db->prepare($query);
-    $stmt_envioArquivo->bindValue(1, $id_Produto, PDO::PARAM_STR);
-    $stmt_envioArquivo->bindValue(2, $codigo, PDO::PARAM_STR);
-    $stmt_envioArquivo->bindValue(3, $caminhoVideo[1], PDO::PARAM_STR);
-    if (!$stmt_envioArquivo->execute())
-    throw new Exception("Error: ao enviar Arquivos");
+    $query = "INSERT INTO medias(produto_codigo,src) VALUES(?,?)";
+    $stmt_envioArquivo = $this->db->prepare($query);
     
-    $db->commit();
-    // foreach ($caminhoImgIndex as $key => $imagens) {
+    try {
+      $this->db->beginTransaction();
 
-    //   $stmt_envioArquivo->bindValue(3, $imagens, PDO::PARAM_STR);
-    // }
+      foreach ($caminhoImgIndex as $src) {
+        $stmt_envioArquivo->bindValue(1,$codigo , PDO::PARAM_STR);
+        $stmt_envioArquivo->bindValue(2, $src, PDO::PARAM_STR);
+        $stmt_envioArquivo->execute();
+      }
 
-    return true;
+      $stmt_envioArquivo->bindValue(1, $codigo, PDO::PARAM_STR);
+      $stmt_envioArquivo->bindValue(2, $caminhoVideo[1], PDO::PARAM_STR);
+      $stmt_envioArquivo->execute();
+      
+      $this->db->commit();
+
+      return true;
+
+    } catch (PDOException $error) {
+      die('ERRO: ' . $error);
+    }
   }
 
   private function validateProduct($codigo){
-    $db = new DataBase();
-    $query_verificarCodigo = "SELECT COUNT(*) FROM produto WHERE CODIGO = ?";
-    $stmt_verificarCodigo = $db->prepare($query_verificarCodigo);
-    $stmt_verificarCodigo->bindValue(1, $codigo, PDO::PARAM_STR);
-    $stmt_verificarCodigo->execute();
-    if ($count = $stmt_verificarCodigo->fetchColumn() > 0) {
-      throw new Exception("O código do produto já existe no banco de dados.");
-    }
 
-    return true;
+    $query_verificarCodigo = "SELECT COUNT(*) FROM produto WHERE CODIGO = ?";
+    $stmt_verificarCodigo = $this->db->prepare($query_verificarCodigo);
+
+    try {
+      $stmt_verificarCodigo->bindValue(1, $codigo, PDO::PARAM_STR);
+      $stmt_verificarCodigo->execute();
+      $count = $stmt_verificarCodigo->fetchColumn();
+      if ($count) {
+        throw new Exception("O código do produto já existe no banco de dados.");
+      }
+
+      return true;
+    } catch (PDOException $error) {
+      echo "ERROR: " . $error;
+    } 
   }
 
   private function validateData($nome, $descricao, $codigo, $valor, $imagens, $video){
