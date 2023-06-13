@@ -17,20 +17,3 @@ if (!empty($_POST['nomeProduto'])
   
   die();
 }
-
-
-if (isset($_POST['user']) && isset($_POST['password'])) {
-
-
-
-  $user = new Usuario();
-  $result = $user->logar($_POST['user'], $_POST['password']);
-
-  if ($result) {
-    echo header("location: ../../cadastro.php");
-    exit();
-  }else{
-      echo "Usuario ou senha não encotrados";
-      echo header("location: ../../login.php");
-  }
-}

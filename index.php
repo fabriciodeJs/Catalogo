@@ -1,5 +1,6 @@
 <?php
 include_once('assets/php/class/DataBase.php');
+
 $conn = new DataBase();
 $pagina = 1;
 // PEGA O NUMERO DA PAGINA VIA URL

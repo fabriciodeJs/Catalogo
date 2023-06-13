@@ -27,17 +27,4 @@ class Usuario{
     return true;
     
   }
-
-
-
-  // public function cadastra($user, $password){
-  //   $bd = new DataBase();
-  //   $query = "INSERT INTO testecatalogo
-  //             FROM usuarios 
-  //             VALUES(?,?);
-
-    
-  // }
-
-
 }
